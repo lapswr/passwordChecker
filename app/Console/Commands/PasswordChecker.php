@@ -26,9 +26,9 @@ class PasswordChecker extends Command
     protected $description = 'Check if the passwords in table are valid or check a password if is valid';
 
     /**
+     * Loaded rules from yaml file
      *
-     *
-     * @var Array
+     * @var array
      */
     protected $rules  = [];
 
@@ -51,21 +51,29 @@ class PasswordChecker extends Command
      */
     public function handle()
     {
-        try {
+        try
+        {
             $passwordInput = $this->argument('password');
 
-            if ($passwordInput) {
+            if ($passwordInput)
+            {
                 $this->info('Password checker will check if the inputted password is valid');
 
-                if ($this->validate($passwordInput)) {
+                if ($this->validate($passwordInput))
+                {
                     $this->info('Password : ' . $passwordInput . ' Is Valid!');
                 }
-            } else {
+            }
+            else
+            {
                 $this->info('Password checker will check the if the passwords table are valid');
 
-                DB::table('passwords')->chunkById(100, function ($passwords) {
-                    foreach ($passwords as $row) {
-                        if ($this->validate($row->password)) {
+                DB::table('passwords')->chunkById(100, function ($passwords)
+                {
+                    foreach ($passwords as $row)
+                    {
+                        if ($this->validate($row->password))
+                        {
                             DB::table('passwords')->where('id', $row->id)->update(['valid' => 1]);
                             $this->info('Password : ' . $row->password . ' Is Valid!');
                         }
@@ -73,7 +81,9 @@ class PasswordChecker extends Command
                 });
             }
             return true;
-        }catch (\Exception $exception){
+        }
+        catch (\Exception $exception)
+        {
             Log::error($exception->getMessage());
             $this->alert('Command Failed during execution, check logs for details (storage/logs/)');
         }
@@ -87,9 +97,12 @@ class PasswordChecker extends Command
      */
     protected function validate($password = null)
     {
-        if($password) {
-            foreach ($this->rules as $rule) {
-                if (($rule['inverted_match']) ? !preg_match($rule['regex'], $password) : preg_match($rule['regex'], $password)) {
+        if($password)
+        {
+            foreach ($this->rules as $rule)
+            {
+                if (($rule['inverted_match']) ? !preg_match($rule['regex'], $password) : preg_match($rule['regex'], $password))
+                {
                     $this->error('Password : ' . $password . ' Is Not Valid!');
                     $this->error($rule['error_message']);
                     return false;
