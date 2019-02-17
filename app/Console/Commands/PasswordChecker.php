@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\Yaml\Yaml;
 
 class PasswordChecker extends Command
@@ -50,34 +51,32 @@ class PasswordChecker extends Command
      */
     public function handle()
     {
-        $passwordInput = $this->argument('password');
+        try {
+            $passwordInput = $this->argument('password');
 
-        if ($passwordInput)
-        {
-            $this->info('Password checker will check if the inputted password is valid');
+            if ($passwordInput) {
+                $this->info('Password checker will check if the inputted password is valid');
 
-            if ($this->validate($passwordInput))
-            {
-                $this->info('Password : '.$passwordInput.' Is Valid!');
-            }
-        }
-        else
-        {
-            $this->info('Password checker will check the if the passwords table are valid');
-
-            DB::table('passwords')->chunkById(100, function ($passwords)
-            {
-                foreach ($passwords as $row)
-                {
-                    if ($this->validate($row->password))
-                    {
-                        DB::table('passwords')->where('id', $row->id)->update(['valid' => 1]);
-                        $this->info('Password : '.$row->password.' Is Valid!');
-                    }
+                if ($this->validate($passwordInput)) {
+                    $this->info('Password : ' . $passwordInput . ' Is Valid!');
                 }
-            });
+            } else {
+                $this->info('Password checker will check the if the passwords table are valid');
+
+                DB::table('passwords')->chunkById(100, function ($passwords) {
+                    foreach ($passwords as $row) {
+                        if ($this->validate($row->password)) {
+                            DB::table('passwords')->where('id', $row->id)->update(['valid' => 1]);
+                            $this->info('Password : ' . $row->password . ' Is Valid!');
+                        }
+                    }
+                });
+            }
+            return true;
+        }catch (\Exception $exception){
+            Log::error($exception->getMessage());
+            $this->alert('Command Failed during execution, check logs for details (storage/logs/)');
         }
-        return true;
     }
 
     /**
