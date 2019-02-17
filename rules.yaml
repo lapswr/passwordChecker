@@ -1,0 +1,12 @@
+- regex: '/.{5,}/'
+  inverted: True
+  error_message: 'Password must be at least 5 characters long'
+- regex: '/(?=.*\d)/'
+  inverted: True
+  error_message: 'Password must have at least 1 digit'
+- regex: '/(.)\1{2,}/'
+  inverted: False
+  error_message: 'Password must have no more than 2 repeating character'
+- regex: '/(?=.*[A-Z])|(?=.*[^A-Za-z0-9])/'
+  inverted: True
+  error_message: 'Password must have at least 1 uppercase letter OR 1 special character'
