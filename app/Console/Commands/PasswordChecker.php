@@ -90,7 +90,7 @@ class PasswordChecker extends Command
     {
         if($password) {
             foreach ($this->rules as $rule) {
-                if (($rule['inverted']) ? !preg_match($rule['regex'], $password) : preg_match($rule['regex'], $password)) {
+                if (($rule['inverted_match']) ? !preg_match($rule['regex'], $password) : preg_match($rule['regex'], $password)) {
                     $this->error('Password : ' . $password . ' Is Not Valid!');
                     $this->error($rule['error_message']);
                     return false;
